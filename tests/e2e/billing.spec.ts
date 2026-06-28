@@ -77,4 +77,27 @@ test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
     await expect(page.locator('text=enregistré avec succès')).toBeVisible();
   });
 
+  test('should load the login page and authenticate successfully with admin credentials', async ({ page }) => {
+    await page.goto('/login');
+    await expect(page.locator('h2')).toContainText('Connexion Admin');
+    
+    // Fill credentials
+    await page.fill('input[type="email"]', 'admin@netzinformatique.fr');
+    await page.fill('input[type="password"]', 'admin');
+    
+    // Submit login form
+    await page.click('button[type="submit"]');
+    
+    // Should log in and redirect to home dashboard
+    await expect(page).toHaveURL('http://localhost:3000/');
+  });
+
+  test('should load webhooks logging page', async ({ page }) => {
+    await page.goto('/webhooks');
+    await expect(page.locator('h2')).toContainText('Journal des Webhooks');
+    await expect(page.locator('button:has-text("Rafraîchir")')).toBeVisible();
+  });
+
 });
+
+

@@ -13,7 +13,9 @@ import {
   ChevronLeft, 
   ChevronRight,
   Menu,
-  X
+  X,
+  LogOut,
+  Activity
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -73,6 +75,12 @@ export function Sidebar() {
       icon: RotateCw, 
       color: 'text-orange-400',
       badge: true
+    },
+    { 
+      name: 'Webhooks', 
+      path: '/webhooks', 
+      icon: Activity, 
+      color: 'text-cyan-400' 
     },
     { name: 'Paramètres', path: '/settings', icon: SettingsIcon, color: 'text-zinc-400' }
   ];
@@ -183,14 +191,31 @@ export function Sidebar() {
         {/* User profile section at the bottom */}
         <div className="p-4 border-t border-zinc-900/40 bg-zinc-950/40">
           <div className="flex items-center gap-3 p-2 rounded-xl bg-zinc-900/20 border border-zinc-900/40">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 font-bold text-xs text-zinc-300">
-              AD
-            </div>
-            {(!isCollapsed || isMobileOpen) && (
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-bold text-zinc-300 truncate">Admin</p>
-                <p className="text-[8px] text-zinc-500 font-semibold truncate">admin@netzinformatique.fr</p>
-              </div>
+            {(!isCollapsed || isMobileOpen) ? (
+              <>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 font-bold text-xs text-zinc-300 flex-shrink-0">
+                  AD
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-bold text-zinc-300 truncate">Admin</p>
+                  <p className="text-[8px] text-zinc-500 font-semibold truncate">admin@netzinformatique.fr</p>
+                </div>
+                <a 
+                  href="/api/auth/logout"
+                  className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Se déconnecter"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                </a>
+              </>
+            ) : (
+              <a 
+                href="/api/auth/logout"
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 border border-zinc-800 transition-all duration-200 mx-auto"
+                title="Se déconnecter"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </a>
             )}
           </div>
         </div>

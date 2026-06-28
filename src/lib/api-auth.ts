@@ -1,9 +1,12 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { decryptSession } from './crypto';
+
+export { encryptSession, decryptSession } from './crypto';
 
 /**
- * Haches the token with SHA-256 for database storage.
+ * Hashes a token with SHA-256 (kept for compatibility).
  */
 export function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -11,11 +14,10 @@ export function hashToken(token: string): string {
 
 /**
  * Server-side session validator.
- * In development or testing (or when SKIP_AUTH=true), returns a default admin email to ease testing.
+ * In local dev/test or when SKIP_AUTH=true, returns fallback admin.
  */
 export async function validateSession(): Promise<string | null> {
-  // Allow authentication bypass for local testing and development
-  if (process.env.NODE_ENV === 'development' || process.env.SKIP_AUTH === 'true') {
+  if (process.env.SKIP_AUTH === 'true') {
     return 'admin@netzinformatique.fr';
   }
 
@@ -27,9 +29,7 @@ export async function validateSession(): Promise<string | null> {
       return null;
     }
 
-    // Default fallback to admin for now, or check postgres sessions table if implemented.
-    // To make it robust and easy on first deploy, we allow access if session exists.
-    return 'admin@netzinformatique.fr';
+    return decryptSession(sessionToken);
   } catch {
     return null;
   }

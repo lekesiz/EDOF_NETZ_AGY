@@ -213,6 +213,9 @@ export async function POST(request: NextRequest) {
       }
 
       results.push(result);
+
+      // Throttling: sleep 500ms between dossiers to avoid rate limits
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     const duration = Date.now() - startTime;

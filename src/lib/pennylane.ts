@@ -60,6 +60,8 @@ export async function fetchAllCustomerInvoices(filter?: string, tokenInput?: str
 
     if (response.has_more && response.next_cursor) {
       cursor = response.next_cursor;
+      // Throttling: sleep 250ms between pages to respect rate limits
+      await new Promise((resolve) => setTimeout(resolve, 250));
     } else {
       hasMore = false;
     }
@@ -89,6 +91,8 @@ export async function fetchAllTransactions(filter?: string, tokenInput?: string)
 
     if (response.has_more && response.next_cursor) {
       cursor = response.next_cursor;
+      // Throttling: sleep 250ms between pages to respect rate limits
+      await new Promise((resolve) => setTimeout(resolve, 250));
     } else {
       hasMore = false;
     }

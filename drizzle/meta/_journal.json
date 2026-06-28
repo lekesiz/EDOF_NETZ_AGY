@@ -15,6 +15,20 @@
       "when": 1782603880075,
       "tag": "0001_nebulous_shatterstar",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782607569745,
+      "tag": "0002_tan_the_santerians",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782607813675,
+      "tag": "0003_sweet_red_hulk",
+      "breakpoints": true
     }
   ]
 }

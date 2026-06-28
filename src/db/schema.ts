@@ -126,3 +126,38 @@ export const settings = pgTable('settings', {
   value: text('value').notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// 8. Email Queue (E-posta Çıkış Kuyruğu)
+export const emailQueue = pgTable('email_queue', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  dossierId: uuid('dossier_id').references(() => dossiers.id, { onDelete: 'cascade' }),
+  email: text('email').notNull(),
+  emailType: text('email_type').notNull(), // bday, survey1, survey6
+  status: text('status').default('pending').notNull(), // pending, sent, cancelled, failed
+  errorMessage: text('error_message'),
+  scheduledFor: timestamp('scheduled_for').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  sentAt: timestamp('sent_at'),
+}, (table) => [
+  index('email_queue_status_idx').on(table.status),
+  index('email_queue_scheduled_idx').on(table.scheduledFor),
+]);
+
+// 9. Webhook Logs (Webhook İstek ve İzleme Kayıtları)
+export const webhookLogs = pgTable('webhook_logs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  webhookType: text('webhook_type').notNull(), // 'wedof'
+  event: text('event'), // 'registrationFolder.updated', etc.
+  externalId: text('external_id'), // associated dossier external ID if any
+  status: text('status').notNull(), // 'success', 'failed'
+  payload: jsonb('payload'), // full raw payload
+  headers: jsonb('headers'), // request headers
+  errorMessage: text('error_message'), // if failed
+  durationMs: integer('duration_ms'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('webhook_logs_type_idx').on(table.webhookType),
+  index('webhook_logs_status_idx').on(table.status),
+  index('webhook_logs_created_at_idx').on(table.createdAt),
+]);
+
