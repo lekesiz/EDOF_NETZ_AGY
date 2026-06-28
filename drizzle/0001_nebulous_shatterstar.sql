@@ -1,0 +1,19 @@
+CREATE INDEX "billing_logs_dossier_idx" ON "billing_logs" USING btree ("dossier_external_id");--> statement-breakpoint
+CREATE INDEX "billing_logs_status_idx" ON "billing_logs" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "billing_logs_created_at_idx" ON "billing_logs" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "billing_logs_run_id_idx" ON "billing_logs" USING btree ("run_id");--> statement-breakpoint
+CREATE INDEX "billing_step_logs_billing_log_idx" ON "billing_step_logs" USING btree ("billing_log_id");--> statement-breakpoint
+CREATE INDEX "billing_step_logs_dossier_idx" ON "billing_step_logs" USING btree ("dossier_external_id");--> statement-breakpoint
+CREATE INDEX "billing_step_logs_step_name_idx" ON "billing_step_logs" USING btree ("step_name");--> statement-breakpoint
+CREATE INDEX "billing_step_logs_status_idx" ON "billing_step_logs" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "billing_step_logs_created_at_idx" ON "billing_step_logs" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "dossiers_is_reconciled_idx" ON "dossiers" USING btree ("is_reconciled");--> statement-breakpoint
+CREATE INDEX "dossiers_amount_idx" ON "dossiers" USING btree ("amount");--> statement-breakpoint
+CREATE INDEX "dossiers_last_name_idx" ON "dossiers" USING btree ("last_name");--> statement-breakpoint
+CREATE INDEX "dossiers_end_date_idx" ON "dossiers" USING btree ("end_date");--> statement-breakpoint
+CREATE INDEX "email_logs_dossier_idx" ON "email_logs" USING btree ("dossier_id");--> statement-breakpoint
+CREATE INDEX "email_logs_email_type_idx" ON "email_logs" USING btree ("email_type");--> statement-breakpoint
+CREATE INDEX "pennylane_invoices_is_paid_idx" ON "pennylane_invoices" USING btree ("is_paid");--> statement-breakpoint
+CREATE INDEX "pennylane_invoices_amount_idx" ON "pennylane_invoices" USING btree ("amount");--> statement-breakpoint
+CREATE INDEX "sync_logs_sync_type_idx" ON "sync_logs" USING btree ("sync_type");--> statement-breakpoint
+CREATE INDEX "sync_logs_status_idx" ON "sync_logs" USING btree ("status");
