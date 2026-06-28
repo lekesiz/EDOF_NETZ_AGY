@@ -2,6 +2,16 @@ import { test, expect } from '@playwright/test';
 
 test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
 
+  test.beforeEach(async ({ page }, testInfo) => {
+    if (!testInfo.title.includes('authenticate successfully')) {
+      await page.goto('/login');
+      await page.fill('input[type="email"]', 'admin@netzinformatique.fr');
+      await page.fill('input[type="password"]', 'admin');
+      await page.click('button[type="submit"]');
+      await page.waitForURL('**/');
+    }
+  });
+
   test('should load the dashboard and display key metrics', async ({ page }) => {
     // 1. Go to dashboard home
     await page.goto('/');
