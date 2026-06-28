@@ -19,7 +19,26 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Fetch all paid invoices from Pennylane
-    const invoices = await fetchPaidInvoices();
+    const rawInvoices = await fetchPaidInvoices();
+
+    // Deduplicate by invoice_number, keeping the latest one based on updated_at
+    const invoicesMap = new Map<string, any>();
+    for (const inv of rawInvoices) {
+      const invNum = String(inv.invoice_number || '').trim();
+      if (!invNum) continue;
+
+      const existing = invoicesMap.get(invNum);
+      if (!existing) {
+        invoicesMap.set(invNum, inv);
+      } else {
+        const existingTime = existing.updated_at ? new Date(existing.updated_at).getTime() : 0;
+        const currentTime = inv.updated_at ? new Date(inv.updated_at).getTime() : 0;
+        if (currentTime > existingTime) {
+          invoicesMap.set(invNum, inv);
+        }
+      }
+    }
+    const invoices = Array.from(invoicesMap.values());
 
     // 2. Cache invoices in the pennylane_invoices table (upsert in batches of 50)
     const BATCH_SIZE = 50;

@@ -18,7 +18,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch all folders from WEDOF
-    const folders = await fetchAllRegistrationFolders();
+    const rawFolders = await fetchAllRegistrationFolders();
+
+    // Deduplicate by externalId to prevent unique constraint conflicts
+    const foldersMap = new Map<string, any>();
+    for (const f of rawFolders) {
+      const extId = String(f.externalId || '').trim();
+      if (!extId) continue;
+
+      const existing = foldersMap.get(extId);
+      if (!existing) {
+        foldersMap.set(extId, f);
+      } else {
+        const existingTime = existing.updateDate ? new Date(existing.updateDate).getTime() : (existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0);
+        const currentTime = f.updateDate ? new Date(f.updateDate).getTime() : (f.updatedAt ? new Date(f.updatedAt).getTime() : 0);
+        if (currentTime > existingTime) {
+          foldersMap.set(extId, f);
+        }
+      }
+    }
+    const folders = Array.from(foldersMap.values());
+
     let success = 0;
     let errors = 0;
 
