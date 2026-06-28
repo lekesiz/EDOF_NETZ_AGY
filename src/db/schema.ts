@@ -13,14 +13,28 @@ export const dossiers = pgTable('dossiers', {
   startDate: date('start_date'),
   endDate: date('end_date'),
   wedofStatus: text('wedof_status').notNull(),
-  amount: numeric('amount', { precision: 10, scale: 2 }).notNull().default('0.00'),
+  amount: numeric('amount', { precision: 12, scale: 2 }).notNull().default('0.00'),
   wedofPaidDate: date('wedof_paid_date'),
   pennylanePaidDate: date('pennylane_paid_date'),
   pennylaneInvoiceNumber: text('pennylane_invoice_number'),
   isReconciled: boolean('is_reconciled').default(false).notNull(),
   rawData: jsonb('raw_data'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  billingState: text('billing_state'),
+  notProcessedDate: timestamp('not_processed_date', { withTimezone: true }),
+  validatedDate: timestamp('validated_date', { withTimezone: true }),
+  acceptedDate: timestamp('accepted_date', { withTimezone: true }),
+  inTrainingDate: timestamp('in_training_date', { withTimezone: true }),
+  terminatedDate: timestamp('terminated_date', { withTimezone: true }),
+  serviceDoneDeclaredDate: timestamp('service_done_declared_date', { withTimezone: true }),
+  serviceDoneValidatedDate: timestamp('service_done_validated_date', { withTimezone: true }),
+  billedDate: timestamp('billed_date', { withTimezone: true }),
+  certificationState: text('certification_state'),
+  attendeeState: text('attendee_state'),
+  controlState: text('control_state'),
+  completionRate: numeric('completion_rate'),
+  paymentDueDate: date('payment_due_date'),
 }, (table) => [
   index('dossiers_is_reconciled_idx').on(table.isReconciled),
   index('dossiers_amount_idx').on(table.amount),
@@ -96,8 +110,11 @@ export const emailLogs = pgTable('email_logs', {
   dossierId: uuid('dossier_id').references(() => dossiers.id, { onDelete: 'cascade' }),
   email: text('email').notNull(),
   emailType: text('email_type').notNull(), // bday, survey1, survey6
+  subject: text('subject'),
+  sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
+  dossierName: text('dossier_name'),
+  externalId: text('external_id'),
   resendId: text('resend_id'),
-  sentAt: timestamp('sent_at').defaultNow().notNull(),
 }, (table) => [
   index('email_logs_dossier_idx').on(table.dossierId),
   index('email_logs_email_type_idx').on(table.emailType),
@@ -113,6 +130,7 @@ export const syncLogs = pgTable('sync_logs', {
   recordsUpdated: integer('records_updated').default(0).notNull(),
   errorMessage: text('error_message'),
   durationMs: integer('duration_ms'),
+  triggeredBy: text('triggered_by'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => [
   index('sync_logs_sync_type_idx').on(table.syncType),
@@ -160,4 +178,91 @@ export const webhookLogs = pgTable('webhook_logs', {
   index('webhook_logs_status_idx').on(table.status),
   index('webhook_logs_created_at_idx').on(table.createdAt),
 ]);
+
+// 10. Auth Codes (OTP Doğrulama)
+export const authCodes = pgTable('auth_codes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull(),
+  code: text('code').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  used: boolean('used').default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// 11. Auth Sessions (Oturum Geçmişi)
+export const authSessions = pgTable('auth_sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull(),
+  token: text('token').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// 12. Contact Notes (Öğrenci Notları)
+export const contactNotes = pgTable('contact_notes', {
+  emailKey: text('email_key').primaryKey(),
+  notes: text('notes'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  updatedBy: text('updated_by'),
+});
+
+// 13. Dossier Bon Achat (Kupon ve Sponsorluk Bilgileri)
+export const dossierBonAchat = pgTable('dossier_bon_achat', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  externalId: text('external_id').unique(),
+  email: text('email'),
+  nomPrenom: text('nom_prenom'),
+  statutParrainage: boolean('statut_parrainage'),
+  montantBonAchat: numeric('montant_bon_achat'),
+  montantBonFilleul: numeric('montant_bon_filleul'),
+  parrain: text('parrain'),
+  totalBons: numeric('total_bons'),
+  fournisseur: text('fournisseur'),
+  dateCommande: date('date_commande'),
+  devisNumero: text('devis_numero'),
+  statutDevis: text('statut_devis'),
+  factureNumero: text('facture_numero'),
+  statutPaiement: text('statut_paiement'),
+  livraison: text('livraison'),
+  modePaiement: text('mode_paiement'),
+  notes: text('notes'),
+  source: text('source'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('idx_bon_achat_email').on(table.email),
+]);
+
+// 14. Dossier Contact Suivi (Arama ve Görüşme Kayıtları)
+export const dossierContactSuivi = pgTable('dossier_contact_suivi', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  externalId: text('external_id').unique(),
+  email: text('email'),
+  nomPrenom: text('nom_prenom'),
+  intituleFormation: text('intitule_formation'),
+  statut: text('statut'),
+  datesSession: text('dates_session'),
+  moyenContact: text('moyen_contact'),
+  dateContact: date('date_contact'),
+  reponseRecue: text('reponse_recue'),
+  notes: text('notes'),
+  source: text('source'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('idx_contact_email').on(table.email),
+]);
+
+// 15. Email Templates (Özelleştirilmiş E-posta Şablonları)
+export const emailTemplates = pgTable('email_templates', {
+  key: text('key').primaryKey(),
+  label: text('label').notNull(),
+  description: text('description'),
+  enabled: boolean('enabled').default(true).notNull(),
+  subject: text('subject').default('').notNull(),
+  bodyHtml: text('body_html').default('').notNull(),
+  variables: text('variables').default(''),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
 

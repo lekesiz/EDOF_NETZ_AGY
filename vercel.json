@@ -1,0 +1,44 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/billing",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/sync/wedof",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/sync/pennylane",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/emails",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle?step=intraining",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle?step=terminate",
+      "schedule": "0 17 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle?step=servicedone",
+      "schedule": "30 17 * * *"
+    },
+    {
+      "path": "/api/cron/sheets",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/cron/relances",
+      "schedule": "30 8 * * *"
+    },
+    {
+      "path": "/api/cron/bon-achat",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

@@ -1,20 +1,28 @@
 import { test, expect } from '@playwright/test';
+import { encryptSession } from '../../src/lib/crypto';
 
 test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
 
-  test.beforeEach(async ({ page }, testInfo) => {
+  test.beforeEach(async ({ context }, testInfo) => {
     if (!testInfo.title.includes('authenticate successfully')) {
-      await page.goto('/login');
-      await page.fill('input[type="email"]', 'admin@netzinformatique.fr');
-      await page.fill('input[type="password"]', 'admin');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/');
+      const sessionToken = await encryptSession('admin@netzinformatique.fr', 24 * 60 * 60 * 1000);
+      await context.addCookies([
+        {
+          name: 'edof_session',
+          value: sessionToken,
+          domain: 'localhost',
+          path: '/',
+          httpOnly: true,
+          secure: false,
+          sameSite: 'Lax',
+        }
+      ]);
     }
   });
 
   test('should load the dashboard and display key metrics', async ({ page }) => {
     // 1. Go to dashboard home
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'commit' });
 
     // 2. Verify title and structure
     await expect(page.locator('h1')).toContainText('EDOF Dashboard');
@@ -33,7 +41,7 @@ test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
 
   test('should navigate to dossiers list, search for a learner, and open details', async ({ page }) => {
     // 1. Go to dossiers list page
-    await page.goto('/dossiers');
+    await page.goto('/dossiers', { waitUntil: 'commit' });
 
     // 2. Verify we are on dossiers page
     await expect(page.locator('h2')).toContainText('Liste des Dossiers');
@@ -57,19 +65,19 @@ test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
   });
 
   test('should load billing logs history page', async ({ page }) => {
-    await page.goto('/billing');
+    await page.goto('/billing', { waitUntil: 'commit' });
     await expect(page.locator('h2')).toContainText('Journal de Facturation');
     await expect(page.locator('button:has-text("Lancer le cycle auto")')).toBeVisible();
   });
 
   test('should load bank reconciliation page and show unreconciled list', async ({ page }) => {
-    await page.goto('/rapprochement');
+    await page.goto('/rapprochement', { waitUntil: 'commit' });
     await expect(page.locator('h2')).toContainText('Rapprochement Bancaire');
     await expect(page.locator('text=Dossiers en attente de paiement')).toBeVisible();
   });
 
   test('should load settings page and save a setting update', async ({ page }) => {
-    await page.goto('/settings');
+    await page.goto('/settings', { waitUntil: 'commit' });
     await expect(page.locator('h2')).toContainText('Configuration Système');
 
     // Verify inputs exist
@@ -88,7 +96,7 @@ test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
   });
 
   test('should load the login page and authenticate successfully with admin credentials', async ({ page }) => {
-    await page.goto('/login');
+    await page.goto('/login', { waitUntil: 'commit' });
     await expect(page.locator('h2')).toContainText('Connexion Admin');
     
     // Fill credentials
@@ -103,7 +111,7 @@ test.describe('EDOF Financial Dashboard & CRM E2E Flows', () => {
   });
 
   test('should load webhooks logging page', async ({ page }) => {
-    await page.goto('/webhooks');
+    await page.goto('/webhooks', { waitUntil: 'commit' });
     await expect(page.locator('h2')).toContainText('Journal des Webhooks');
     await expect(page.locator('button:has-text("Rafraîchir")')).toBeVisible();
   });

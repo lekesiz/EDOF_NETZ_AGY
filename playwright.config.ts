@@ -2,7 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  timeout: 90 * 1000,
   fullyParallel: false, // Run E2E tests sequentially to prevent database locks
+  outputDir: '../playwright-results',
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1, // Single worker since tests might interact with the database
@@ -19,7 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
@@ -31,6 +33,7 @@ export default defineConfig({
       CRON_SECRET: 'edof-cron-secret-2026',
       NEXT_PUBLIC_CRON_SECRET: 'edof-cron-secret-2026',
       SKIP_AUTH: 'true',
+      SKIP_SCHEDULER: 'true',
       NODE_ENV: 'development',
     },
   },

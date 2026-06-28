@@ -29,6 +29,20 @@
       "when": 1782607813675,
       "tag": "0003_sweet_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782653182683,
+      "tag": "0004_classy_serpent_society",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782653201347,
+      "tag": "0005_neat_spiral",
+      "breakpoints": true
     }
   ]
 }
